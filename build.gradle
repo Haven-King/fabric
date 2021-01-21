@@ -21,7 +21,7 @@ class Globals {
 	static def baseVersion = "0.29.3"
 	static def mcVersion = "1.16.4"
 	static def yarnVersion = "+build.1"
-	static def loaderVersion = "0.10.5+build.213"
+	static def loaderVersion = "0.11.1+local"
 }
 
 version = Globals.baseVersion + "+" + (ENV.GITHUB_RUN_NUMBER ? "" : "local-") + getBranch()
