@@ -22,13 +22,13 @@
   "description": "Hooks for registering and dealing with configs.",
   "entrypoints": {
     "main": [
-      "net.fabricmc.fabric.impl.config.SyncConfigValues"
+      "net.fabricmc.fabric.impl.config.SyncConfigValuesImpl"
     ],
     "client": [
-      "net.fabricmc.fabric.impl.config.SyncConfigValues"
+      "net.fabricmc.fabric.impl.config.SyncConfigValuesImpl"
     ],
-    "configsLoaded": [
-      "net.fabricmc.fabric.impl.config.RegisterValueProviderProviders"
+    "config": [
+      "net.fabricmc.fabric.impl.config.MinecraftConfigEnvironment"
     ]
   },
   "mixins": [

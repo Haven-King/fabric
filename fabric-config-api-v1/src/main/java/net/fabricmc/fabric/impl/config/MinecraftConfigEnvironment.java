@@ -16,15 +16,19 @@
 
 package net.fabricmc.fabric.impl.config;
 
+import java.util.function.Consumer;
+
 import net.minecraft.client.MinecraftClient;
 
+import net.fabricmc.loader.api.config.SaveType;
+import net.fabricmc.loader.api.config.entrypoint.ConfigEnvironment;
+import net.fabricmc.loader.api.config.entrypoint.ConfigPostInitializer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.fabric.api.config.v1.FabricSaveTypes;
 import net.fabricmc.loader.api.FabricLoader;
-import net.fabricmc.loader.api.config.ConfigsLoadedEntrypoint;
 import net.fabricmc.loader.api.config.value.ValueContainerProvider;
 
-public class RegisterValueProviderProviders implements ConfigsLoadedEntrypoint {
+public class MinecraftConfigEnvironment implements ConfigPostInitializer, ConfigEnvironment {
 	@Override
 	public void onConfigsLoaded() {
 		ValueContainerProvider.register(saveType -> {
@@ -38,9 +42,23 @@ public class RegisterValueProviderProviders implements ConfigsLoadedEntrypoint {
 				} else if (client.getCurrentServerEntry() != null) {
 					return ((ValueContainerProvider) client.getCurrentServerEntry());
 				}
+			} else if (saveType == FabricSaveTypes.USER && envType == EnvType.SERVER) {
+				return ((ValueContainerProvider) FabricLoader.getInstance().getGameInstance());
+			} else if (saveType == FabricSaveTypes.USER && envType == EnvType.CLIENT) {
+				return ((ValueContainerProvider) MinecraftClient.getInstance().getCurrentServerEntry());
 			}
 
 			return null;
 		});
+	}
+
+	@Override
+	public void addToRoot(Consumer<SaveType> consumer) {
+		switch (FabricLoader.getInstance().getEnvironmentType()) {
+		case CLIENT:
+			consumer.accept(FabricSaveTypes.USER);
+		case SERVER:
+			consumer.accept(FabricSaveTypes.LEVEL);
+		}
 	}
 }

@@ -24,11 +24,16 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.text.HoverEvent;
+import net.minecraft.text.LiteralText;
 import net.minecraft.text.MutableText;
+import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.text.TextColor;
 import net.minecraft.world.World;
 
+import net.fabricmc.fabric.test.config.Color;
+import net.fabricmc.loader.api.config.util.Table;
 import net.fabricmc.fabric.test.config.ConfigTest;
 
 @Mixin(PlayerEntity.class)
@@ -37,10 +42,24 @@ public abstract class PlayerEntityMixin extends LivingEntity {
 		super(entityType, world);
 	}
 
-	@Inject(method = "getName", at = @At("RETURN"))
+	@Inject(method = "getDisplayName", at = @At("RETURN"), cancellable = true)
 	private void setNameColor(CallbackInfoReturnable<Text> cir) {
-		((MutableText) cir.getReturnValue()).styled(style -> style.withColor(TextColor.fromRgb(
-				ConfigTest.MY_FAVORITE_COLOR.get(this.getUuid()).value
-		)));
+		if (this.getScoreboardTeam() == null) {
+			MutableText text = ((MutableText) cir.getReturnValue()).styled(style -> style.withColor(TextColor.fromRgb(
+					ConfigTest.MY_FAVORITE_COLOR.getValue(this.getUuid()).value
+			)));
+
+			MutableText tags = new LiteralText("");
+
+			for (Table.Entry<String, Color> entry : ConfigTest.TAGS.getValue(this.getUuid())) {
+				tags.append(new LiteralText("[").styled(style -> Style.EMPTY)
+						.append(new LiteralText(entry.getKey())
+								.styled(style -> style.withColor(TextColor.fromRgb(entry.getValue().value))))
+						.append(new LiteralText("]").styled(style -> Style.EMPTY))
+				);
+			}
+
+			text.styled(style -> style.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, tags)));
+		}
 	}
 }

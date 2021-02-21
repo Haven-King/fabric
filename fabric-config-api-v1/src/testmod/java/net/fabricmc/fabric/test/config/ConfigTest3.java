@@ -18,18 +18,18 @@ package net.fabricmc.fabric.test.config;
 
 import org.jetbrains.annotations.NotNull;
 
-import net.fabricmc.fabric.api.config.v1.GsonSerializer;
-import net.fabricmc.loader.api.config.entrypoint.ConfigInitializer;
-import net.fabricmc.loader.api.config.util.Array;
-import net.fabricmc.loader.api.config.data.DataCollector;
-import net.fabricmc.loader.api.config.data.DataType;
 import net.fabricmc.fabric.api.config.v1.FabricSaveTypes;
 import net.fabricmc.loader.api.config.ConfigSerializer;
 import net.fabricmc.loader.api.config.SaveType;
+import net.fabricmc.loader.api.config.data.DataCollector;
+import net.fabricmc.loader.api.config.data.DataType;
+import net.fabricmc.loader.api.config.entrypoint.ConfigInitializer;
+import net.fabricmc.loader.api.config.serialization.TomlSerializer;
+import net.fabricmc.loader.api.config.util.Array;
 import net.fabricmc.loader.api.config.value.ConfigValueCollector;
 import net.fabricmc.loader.api.config.value.ValueKey;
 
-public class ConfigTest2 implements ConfigInitializer {
+public class ConfigTest3 implements ConfigInitializer {
 	public static final ValueKey<Integer> MY_FAVORITE_NUMBER = new ValueKey.Builder<>(() -> 7)
 			.with(new Bounds.Int(0, 10))
 			.with(DataType.COMMENT, "Like seriously, all other numbers suck.")
@@ -44,17 +44,17 @@ public class ConfigTest2 implements ConfigInitializer {
 
 	@Override
 	public @NotNull ConfigSerializer getSerializer() {
-		return GsonSerializer.DEFAULT;
+		return TomlSerializer.INSTANCE;
 	}
 
 	@Override
 	public @NotNull SaveType getSaveType() {
-		return FabricSaveTypes.USER;
+		return FabricSaveTypes.LEVEL;
 	}
 
 	@Override
 	public @NotNull String getName() {
-		return "config2";
+		return "config3";
 	}
 
 	@Override
@@ -62,6 +62,10 @@ public class ConfigTest2 implements ConfigInitializer {
 		collector.addConfigValue(MY_FAVORITE_NUMBER, "favorite_number");
 		collector.addConfigValue(MY_FAVORITE_FRUIT, "favorite_fruit");
 		collector.addConfigValue(MY_FAVORITE_CITIES, "favorite_cities");
+
+		for (int i = 0; i < 10; ++i) {
+			collector.addConfigValue(new ValueKey.Builder<>(() -> 0).build(), "test", "value" + i);
+		}
 	}
 
 	@Override

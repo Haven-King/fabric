@@ -63,11 +63,6 @@ public class MixinServerInfo implements ValueContainerProvider {
 		return this.playerValueContainers.computeIfAbsent(playerId, id -> ValueContainer.of(null, FabricSaveTypes.USER));
 	}
 
-	@Override
-	public int playerCount() {
-		return playerValueContainers.size();
-	}
-
 	@NotNull
 	@Override
 	public Iterator<Map.Entry<UUID, ValueContainer>> iterator() {
