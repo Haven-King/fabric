@@ -29,14 +29,13 @@ import net.fabricmc.fabric.api.config.v1.SyncType;
 import net.fabricmc.loader.api.config.data.Constraint;
 import net.fabricmc.loader.api.config.data.DataCollector;
 import net.fabricmc.loader.api.config.data.DataType;
-import net.fabricmc.loader.api.config.serialization.TOMLSerializer;
-import net.fabricmc.loader.api.config.serialization.toml.TomlElement;
 import net.fabricmc.loader.api.config.util.Table;
 import net.fabricmc.loader.api.config.value.ValueKey;
 import net.fabricmc.loader.api.config.data.SaveType;
 import net.fabricmc.loader.api.config.serialization.ConfigSerializer;
+import net.fabricmc.loader.api.config.serialization.PropertiesSerializer;
 
-public class UserConfigTest extends Config<Map<String, TomlElement>> {
+public class UserConfigTest extends Config<Map<String, String>> {
 	private static final Random RANDOM = new Random();
 
 	public static int EASY_FIELD_ACCESSIBLE_CONFIG_VALUE;
@@ -72,8 +71,8 @@ public class UserConfigTest extends Config<Map<String, TomlElement>> {
 			.build();
 
 	@Override
-	public @NotNull ConfigSerializer<Map<String, TomlElement>> getSerializer() {
-		return TOMLSerializer.INSTANCE;
+	public @NotNull ConfigSerializer<Map<String, String>> getSerializer() {
+		return PropertiesSerializer.INSTANCE;
 	}
 
 	@Override
@@ -94,12 +93,12 @@ public class UserConfigTest extends Config<Map<String, TomlElement>> {
 	}
 
 	static {
-		TOMLSerializer.INSTANCE.addSerializer(Color.class, new ColorSerializer());
+		PropertiesSerializer.INSTANCE.addSerializer(Color.class, new ColorSerializer());
 	}
 
-	static class ColorSerializer implements TOMLSerializer.ValueSerializer<Color> {
+	static class ColorSerializer implements PropertiesSerializer.ValueSerializer<Color> {
 		@Override
-		public Object serialize(Color value) {
+		public String serialize(Color value) {
 			if (value.value == -1) {
 				return "0xFFFFFFFF";
 			} else {
@@ -108,9 +107,7 @@ public class UserConfigTest extends Config<Map<String, TomlElement>> {
 		}
 
 		@Override
-		public Color deserialize(Object object) {
-			String string = (String) object;
-
+		public Color deserialize(String string) {
 			if (string.equalsIgnoreCase("0xFFFFFFFF")) {
 				return new Color(-1);
 			} else {
